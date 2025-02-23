@@ -8,19 +8,23 @@ import TeacherProfile from "./pages/teacherProfile";
 import AddClass from "./pages/AddClass";
 import EditTeacherProfile from "./pages/EditTeacherProfile";
 import ClassroomManage from "./pages/ClassroomManage";
-//
+import CheckinSession from "./pages/CheckinSession";
+import QuestionAnswer from "./pages/QuestionAnswerScreen";
+
 const App = () => {
   return (
     <AuthProvider>
       <Router>
         <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Login />} />
+          {/* <Route path="/" element={<Home />} /> */}
           <Route path="/profile" element={<Profile />} />
           <Route path="/teacher-profile" element={<TeacherProfile />}/>
           <Route path="/add-class" element={<AddClass />}/>
           <Route path="/edit-teacher-profile" element={<EditTeacherProfile />} />
           <Route path="/classroom/:cid" element={<ClassroomManage />} />
+          <Route path="/checkin/:cid/:cno" element={<CheckinSession />}/>
+          <Route path="/question-answer" element={<QuestionAnswer />}/>
         </Routes>
       </Router>
     </AuthProvider>

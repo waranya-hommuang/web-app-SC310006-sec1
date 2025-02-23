@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "696041821628",
+    "firebase_url": "https://web-and-mobile-app-629ee-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "web-and-mobile-app-629ee",
+    "storage_bucket": "web-and-mobile-app-629ee.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:696041821628:android:86dedce438ed594aeb07b9",
+        "android_client_info": {
+          "package_name": "com.kku.myexpoapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "696041821628-2ea95jv32m0i42s75ltlrdo7i1229n82.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCYetrbg7hXtzSfKTRcyYfFucTw0ibxzts"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "696041821628-2ea95jv32m0i42s75ltlrdo7i1229n82.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

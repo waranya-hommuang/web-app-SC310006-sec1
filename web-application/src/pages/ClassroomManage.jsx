@@ -1,9 +1,9 @@
-import { useEffect, useState, useRef } from "react";
-import { useAuth } from "../AuthContext";
-import { useParams, useNavigate } from "react-router-dom";
-import { getFirestore, doc, getDoc, collection, getDocs, setDoc } from "firebase/firestore";
+import React, { useEffect, useState, useRef } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { getFirestore, collection, doc, getDoc, getDocs, addDoc,setDoc, query, orderBy, onSnapshot } from 'firebase/firestore';
+import { useAuth } from '../AuthContext';
+import { db } from "../firebase";
 
-//ยังไม่มีการแสดงรายชื่อนักศึกษาที่ลงทะเบียนวิชา
 const ClassroomManage = () => {
   const { user } = useAuth();
   const { cid } = useParams();
@@ -12,7 +12,10 @@ const ClassroomManage = () => {
   const [classroom, setClassroom] = useState(null);
   const [students, setStudents] = useState([]);
   const [checkins, setCheckins] = useState([]);
-  const qrRef = useRef(null); // ใช้ ref สำหรับ QRCode div
+  const [code, setCode] = useState("");
+  const [date, setDate] = useState("");
+  const [status, setStatus] = useState(0);
+  const qrRef = useRef(null);
 
   useEffect(() => {
     const fetchClassroom = async () => {
@@ -22,28 +25,29 @@ const ClassroomManage = () => {
         setClassroom(classSnap.data());
       }
     };
-    
+
     const fetchStudents = async () => {
       const studentsRef = collection(db, `classroom/${cid}/students`);
       const studentsSnap = await getDocs(studentsRef);
+      //console.log("Fetched Students:", studentsSnap.docs.map(doc => doc.data()));
       setStudents(studentsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
     };
-    
-    const fetchCheckins = async () => {
-      const checkinRef = collection(db, `classroom/${cid}/checkin`);
-      const checkinSnap = await getDocs(checkinRef);
-      setCheckins(checkinSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-    };
+
+    // const fetchCheckins = async () => {
+    //   const checkinRef = collection(db, `classroom/${cid}/checkin`);
+    //   const checkinSnap = await getDocs(checkinRef);
+    //   setCheckins(checkinSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    // };
+
 
     fetchClassroom();
     fetchStudents();
-    fetchCheckins();
+    // fetchCheckins();
   }, [cid, db]);
 
-  // Generate QR Code when classroom is available
   useEffect(() => {
     if (classroom && qrRef.current) {
-      qrRef.current.innerHTML = ""; // ล้าง QR ก่อนสร้างใหม่
+      qrRef.current.innerHTML = "";
       new window.QRCode(qrRef.current, {
         text: `https://your-app.com/register/${cid}`,
         width: 150,
@@ -52,26 +56,90 @@ const ClassroomManage = () => {
     }
   }, [classroom, cid]);
 
-  const addCheckin = async () => {
-    const cno = checkins.length + 1;
-    const checkinRef = doc(db, `classroom/${cid}/checkin/${cno}`);
-    await setDoc(checkinRef, {
-      code: Math.random().toString(36).substring(7).toUpperCase(),
-      date: new Date().toISOString(),
-      status: 0,
-    });
+  // useEffect(() => {
+  //   fetchCheckins();
+  // }, []);
 
-    for (const student of students) {
-      const scoreRef = doc(db, `classroom/${cid}/checkin/${cno}/scores/${student.id}`);
-      await setDoc(scoreRef, {
-        uid: student.id,
-        name: student.name,
-        remark: "",
-        score: 0,
-        status: 0,
+  // const fetchCheckins = async () => {
+  //   const checkinRef = collection(db, `classroom/${cid}/checkin`);
+  //   const q = query(checkinRef, orderBy("timestamp", "desc"));
+  //   const querySnapshot = await getDocs(q);
+  //   const checkinList = querySnapshot.docs.map((doc, index) => ({ id: doc.id, index: index + 1, ...doc.data() }));
+  //   setCheckins(checkinList);
+  // };
+
+  useEffect(() => {
+    const q = query(collection(db, `classroom/${cid}/checkin`), orderBy("date", "asc"));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      setCheckins(
+        snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+      );
+    });
+    return () => unsubscribe();
+  }, [cid]);
+
+  const handleAddCheckin = async () => {
+    if (!code || !date) return alert("กรุณากรอกข้อมูลให้ครบถ้วน");
+    
+    try {
+      const newCheckinRef = doc(collection(db, `classroom/${cid}/checkin`));
+      const newCheckin = {
+        code,
+        date,
+        status,
+        studentCount: 0 // ค่าเริ่มต้น 0
+      };
+      await setDoc(newCheckinRef, newCheckin);
+      
+      // คัดลอกรายชื่อนักเรียนทั้งหมดไปยัง /scores พร้อม name และ stdid
+      const studentsSnap = await getDocs(collection(db, `classroom/${cid}/students`));
+      const batchPromises = studentsSnap.docs.map(studentDoc => {
+        const studentData = studentDoc.data();
+        return setDoc(doc(db, `classroom/${cid}/checkin/${newCheckinRef.id}/scores`, studentDoc.id), {
+          stdid: studentData.stdid,
+          name: studentData.name,
+          status: 0 // ตั้งค่าเริ่มต้นว่ายังไม่เช็คชื่อ
+        });
       });
+      await Promise.all(batchPromises);
+      
+      setCheckins([...checkins, { id: newCheckinRef.id, ...newCheckin }]);
+      setCode("");
+      setDate("");
+      setStatus(0);
+    } catch (error) {
+      console.error("Error adding checkin: ", error);
     }
-    alert("สร้างการเช็คชื่อสำเร็จ!");
+  };
+
+
+  // const addCheckin = async () => {
+  //   console.log("กำลังเพิ่มการเช็คชื่อ...");
+  //   const newCheckinId = Date.now().toString();
+  //   const checkinRef = doc(db, `classroom/${cid}/checkin/${newCheckinId}`);
+  //   const studentsRef = collection(db, `classroom/${cid}/students`);
+  //   const scoresRef = collection(db, `classroom/${cid}/checkin/${newCheckinId}/scores`);
+
+  //   const studentSnapshot = await getDocs(studentsRef);
+  //   const students = studentSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+  //   await setDoc(checkinRef, {
+  //     timestamp: new Date(),
+  //     studentCount: 0,
+  //     status: 0 // 0 = ยังไม่เริ่ม
+  //   });
+
+  //   students.forEach(async student => {
+  //     const studentScoreRef = doc(scoresRef, student.id);
+  //     await setDoc(studentScoreRef, { status: 0 });
+  //   });
+  //   console.log("การเช็คชื่อถูกเพิ่มสำเร็จ!");
+  //   fetchCheckins();
+  // };
+
+  const handleNavigateToCheckin = (cno) => {
+    console.log(`Navigating to CheckinSession with cno: ${cno}`);
+    navigate(`/checkin/${cid}/${cno}`);
   };
 
   return (
@@ -86,36 +154,94 @@ const ClassroomManage = () => {
           <h3 className="text-lg font-semibold mt-6">QR Code ลงทะเบียน</h3>
           <div ref={qrRef} className="mt-2"></div>
 
-          {/* รายชื่อนักเรียน */}
+          {/* ตารางแสดงรายชื่อนักเรียน */}
           <h3 className="text-lg font-semibold mt-6">รายชื่อนักเรียน</h3>
-          <table className="w-full border-collapse border border-gray-300 mt-2">
+          <table className="min-w-full border-collapse border border-gray-300 mt-2">
             <thead>
-              <tr className="bg-gray-100">
-                <th className="border p-2">ลำดับ</th>
-                <th className="border p-2">รหัส</th>
-                <th className="border p-2">ชื่อ</th>
-                <th className="border p-2">สถานะ</th>
+              <tr>
+                <th className="border border-gray-300 px-4 py-2">ลำดับ</th>
+                <th className="border border-gray-300 px-4 py-2">รหัสนักเรียน</th>
+                <th className="border border-gray-300 px-4 py-2">ชื่อ</th>
+                <th className="border border-gray-300 px-4 py-2">สถานะ</th>
               </tr>
             </thead>
             <tbody>
               {students.map((student, index) => (
-                <tr key={student.id} className="border">
-                  <td className="border p-2">{index + 1}</td>
-                  <td className="border p-2">{student.stdid}</td>
-                  <td className="border p-2">{student.name}</td>
-                  <td className="border p-2">{student.status === 1 ? "ตรวจสอบแล้ว" : "ยังไม่ตรวจสอบ"}</td>
+                <tr key={student.id}>
+                  <td className="border border-gray-300 px-4 py-2 text-center">{index + 1}</td>
+                  <td className="border border-gray-300 px-4 py-2">{student.stdid}</td>
+                  <td className="border border-gray-300 px-4 py-2">{student.name}</td>
+                  <td className="border border-gray-300 px-4 py-2 text-center">
+                    {student.status === 1 ? 'ตรวจสอบแล้ว' : 'ยังไม่ตรวจสอบ'}
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
 
-          {/* ปุ่มเพิ่มการเช็คชื่อ */}
-          <button
-            onClick={addCheckin}
-            className="bg-blue-500 text-white px-4 py-2 mt-4 rounded"
-          >
-            + เพิ่มการเช็คชื่อ
-          </button>
+          <h2 className="text-lg font-semibold mb-4">จัดการเช็คชื่อ</h2>
+          <div className="mb-4 flex gap-2">
+            <input
+              type="text"
+              placeholder="รหัสเช็คชื่อ"
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              className="border p-2 rounded w-1/4"
+            />
+            <input
+              type="datetime-local"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className="border p-2 rounded w-1/3"
+            />
+            <button
+              onClick={handleAddCheckin}
+              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+              เพิ่มเช็คชื่อ
+            </button>
+          </div>
+
+          <h3 className="text-lg font-semibold mt-6">ประวัติการเช็คชื่อ</h3>
+          <table className="w-full border-collapse border border-gray-400">
+            <thead>
+              <tr>
+                <th className="border border-gray-300 px-4 py-2">ลำดับ</th>
+                <th className="border border-gray-300 px-4 py-2">วัน-เวลา</th>
+                <th className="border border-gray-300 px-4 py-2">จำนวนคนเข้าเรียน</th>
+                <th className="border border-gray-300 px-4 py-2">สถานะ</th>
+                <th className="border border-gray-300 px-4 py-2">จัดการ</th>
+              </tr>
+            </thead>
+            <tbody>
+              {checkins.map((checkin, index) => (
+                <tr key={checkin.id}>
+                  <td className="border border-gray-300 px-4 py-2 text-center">{index + 1}</td>
+                  <td className="border border-gray-300 px-4 py-2">{new Date(checkin.date).toLocaleString("th-TH")}</td>
+                  <td className="border border-gray-300 px-4 py-2">{checkin.studentCount}</td>
+                  <td className="border border-gray-300 px-4 py-2 text-center">
+                    {checkin.status === 0 ? "ยังไม่เริ่ม" : checkin.status === 1 ? "กำลังเช็คชื่อ" : "เสร็จแล้ว"}
+                  </td>
+                  <td className="border border-gray-400 px-4 py-2">
+                    <button className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                      onClick={() => handleNavigateToCheckin(checkin.id)}>
+                      เช็คชื่อ
+                    </button>
+                  </td>
+                </tr>
+              ))}
+              {/* <tr>
+                <td colSpan="4" className="border border-gray-400 px-4 py-2"></td>
+                <td className="border border-gray-400 px-4 py-2">
+                  <button
+                    onClick={addCheckin}
+                    className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+                  >
+                    เพิ่ม
+                  </button>
+                </td>
+              </tr> */}
+            </tbody>
+          </table>
         </>
       ) : (
         <p className="text-center mt-10 text-gray-500">กำลังโหลดข้อมูล...</p>
