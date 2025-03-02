@@ -19,27 +19,17 @@ const HomeScreen = ({ navigation }) => {
     }
   }, []);
 
-  const handlePickImage = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
-    if (!result.cancelled) {
-      // ทำการอัพโหลดภาพไป Firebase หรือใช้ในแอป
-    }
-  };
 
   return (
     <View>
       {userInfo ? (
         <>
-          <Text>Name: {userInfo.name}</Text>
+          {/* <Text>Name: {userInfo.name}</Text> */}
           <Text>Email: {userInfo.email}</Text>
-          <Button title="Edit Profile" onPress={handlePickImage} />
+          {/* <Button title="Edit Profile" onPress={handlePickImage} /> */}
           <Button title="Add Class" onPress={() => navigation.navigate("AddClass")} />
           <Button title="Scan QR Code" onPress={() => navigation.navigate("ScanQRCode")} />
+          <Button title=" My classroom" onPress={() => navigation.navigate("ClassroomsScreen")}/>
         </>
       ) : (
         <Text>Loading...</Text>

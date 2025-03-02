@@ -5,6 +5,7 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useAuth } from "../AuthContext";
 import { v4 as uuidv4 } from "uuid"; // ใช้สร้างรหัสสุ่ม
 // import { Card,Button,Input } from "antd";
+import { Button, Card } from "antd";
 
 const AddClass = () => {
   const { user } = useAuth(); // ดึง user จาก AuthContext
@@ -52,31 +53,33 @@ const AddClass = () => {
   };
 
   return (
+<div className="bg-gray-50 h-screen">
     <div className="p-6 max-w-lg mx-auto">
-      <div className="p-4">
+      <Card className="p-4">
         <h2 className="text-2xl font-bold text-center mb-4">เพิ่มวิชา</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label>รหัสวิชา</label>
-            <input name="code" value={formData.code} onChange={handleChange} required />
+            <label className="">รหัสวิชา</label>
+            <input className="border-1 border-solid border-gray-300 rounded-sm ml-6" name="code" value={formData.code} onChange={handleChange} required />
           </div>
           <div>
-            <label>ชื่อวิชา</label>
-            <input name="name" value={formData.name} onChange={handleChange} required />
+            <label className="">ชื่อวิชา</label>
+            <input className="border-1 border-solid border-gray-300 rounded-sm ml-8" name="name" value={formData.name} onChange={handleChange} required />
           </div>
           <div>
-            <label>ห้องเรียน</label>
-            <input name="room" value={formData.room} onChange={handleChange} required />
+            <label className="">ห้องเรียน</label>
+            <input className="border-1 border-solid border-gray-300 rounded-sm ml-5" name="room" value={formData.room} onChange={handleChange} required />
           </div>
           <div>
-            <label>URL รูปภาพ</label>
-            <input type="url" name="photoURL" value={formData.photoURL} onChange={handleChange} placeholder="https://example.com/image.jpg" required />
+            <label className="">URL รูปภาพ</label>
+            <input className="border-1 border-solid border-gray-300 rounded-sm ml-1" type="url" name="photoURL" value={formData.photoURL} onChange={handleChange} placeholder="https://example.com/image.jpg" required />
           </div>
-          <button type="submit" className="w-full" disabled={loading}>
+          <button color="cyan" variant="solid" type="submit" className="text-white rounded-md py-1 w-full bg-sky-500/100" disabled={loading}>
             {loading ? "กำลังบันทึก..." : "บันทึกวิชา"}
           </button>
         </form>
-      </div>
+      </Card>
+    </div>
     </div>
   );
 };

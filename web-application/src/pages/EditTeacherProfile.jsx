@@ -67,6 +67,7 @@ const EditTeacherProfile = () => {
     if (loading) return <p>กำลังโหลดข้อมูล...</p>;
   
     return (
+      <div className="bg-gray-100 h-screen">
       <div className="p-6 max-w-4xl mx-auto">
         <Card className="p-4 flex flex-col items-center text-center">
           <Avatar className="w-24 h-24 mb-4" src={photoURL || "/default-avatar.png"} />
@@ -98,6 +99,7 @@ const EditTeacherProfile = () => {
             บันทึกข้อมูล
           </Button>
         </Card>
+      </div>
       </div>
     );
   };

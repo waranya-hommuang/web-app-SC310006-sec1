@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { getFirestore, collection, doc, getDoc, getDocs, addDoc,setDoc, query, orderBy, onSnapshot } from 'firebase/firestore';
 import { useAuth } from '../AuthContext';
 import { db } from "../firebase";
+import { Button, Card, Space, Table, Tag } from "antd";
 
 const ClassroomManage = () => {
   const { user } = useAuth();
@@ -33,13 +34,6 @@ const ClassroomManage = () => {
       setStudents(studentsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
     };
 
-    // const fetchCheckins = async () => {
-    //   const checkinRef = collection(db, `classroom/${cid}/checkin`);
-    //   const checkinSnap = await getDocs(checkinRef);
-    //   setCheckins(checkinSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-    // };
-
-
     fetchClassroom();
     fetchStudents();
     // fetchCheckins();
@@ -56,17 +50,6 @@ const ClassroomManage = () => {
     }
   }, [classroom, cid]);
 
-  // useEffect(() => {
-  //   fetchCheckins();
-  // }, []);
-
-  // const fetchCheckins = async () => {
-  //   const checkinRef = collection(db, `classroom/${cid}/checkin`);
-  //   const q = query(checkinRef, orderBy("timestamp", "desc"));
-  //   const querySnapshot = await getDocs(q);
-  //   const checkinList = querySnapshot.docs.map((doc, index) => ({ id: doc.id, index: index + 1, ...doc.data() }));
-  //   setCheckins(checkinList);
-  // };
 
   useEffect(() => {
     const q = query(collection(db, `classroom/${cid}/checkin`), orderBy("date", "asc"));
@@ -80,29 +63,35 @@ const ClassroomManage = () => {
 
   const handleAddCheckin = async () => {
     if (!code || !date) return alert("กรุณากรอกข้อมูลให้ครบถ้วน");
-    
+  
     try {
-      const newCheckinRef = doc(collection(db, `classroom/${cid}/checkin`));
+      // คิวรี่เพื่อหาค่า cno ที่มากที่สุด
+      const checkinRef = collection(db, `classroom/${cid}/checkin`);
+      const checkinQuery = query(checkinRef, orderBy("cno", "desc"));
+      const checkinSnap = await getDocs(checkinQuery);
+  
+      let newCno = 1; // ถ้ายังไม่มีเช็คอิน ให้เริ่มที่ 1
+      if (!checkinSnap.empty) {
+        const latestCheckin = checkinSnap.docs[0].data();
+        newCno = latestCheckin.cno + 1; // คำนวณลำดับถัดไป
+      }
+  
+      // สร้างเอกสารใหม่
+      const newCheckinRef = doc(checkinRef);
       const newCheckin = {
+        cno: newCno, // ใช้ค่า cno ที่เรียงลำดับ
         code,
         date,
         status,
-        studentCount: 0 // ค่าเริ่มต้น 0
+        studentCount: 0, // ค่าเริ่มต้น
       };
+      
       await setDoc(newCheckinRef, newCheckin);
-      
-      // คัดลอกรายชื่อนักเรียนทั้งหมดไปยัง /scores พร้อม name และ stdid
-      const studentsSnap = await getDocs(collection(db, `classroom/${cid}/students`));
-      const batchPromises = studentsSnap.docs.map(studentDoc => {
-        const studentData = studentDoc.data();
-        return setDoc(doc(db, `classroom/${cid}/checkin/${newCheckinRef.id}/scores`, studentDoc.id), {
-          stdid: studentData.stdid,
-          name: studentData.name,
-          status: 0 // ตั้งค่าเริ่มต้นว่ายังไม่เช็คชื่อ
-        });
-      });
+  
+  
       await Promise.all(batchPromises);
-      
+  
+      // อัปเดต state checkins
       setCheckins([...checkins, { id: newCheckinRef.id, ...newCheckin }]);
       setCode("");
       setDate("");
@@ -112,31 +101,6 @@ const ClassroomManage = () => {
     }
   };
 
-
-  // const addCheckin = async () => {
-  //   console.log("กำลังเพิ่มการเช็คชื่อ...");
-  //   const newCheckinId = Date.now().toString();
-  //   const checkinRef = doc(db, `classroom/${cid}/checkin/${newCheckinId}`);
-  //   const studentsRef = collection(db, `classroom/${cid}/students`);
-  //   const scoresRef = collection(db, `classroom/${cid}/checkin/${newCheckinId}/scores`);
-
-  //   const studentSnapshot = await getDocs(studentsRef);
-  //   const students = studentSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-  //   await setDoc(checkinRef, {
-  //     timestamp: new Date(),
-  //     studentCount: 0,
-  //     status: 0 // 0 = ยังไม่เริ่ม
-  //   });
-
-  //   students.forEach(async student => {
-  //     const studentScoreRef = doc(scoresRef, student.id);
-  //     await setDoc(studentScoreRef, { status: 0 });
-  //   });
-  //   console.log("การเช็คชื่อถูกเพิ่มสำเร็จ!");
-  //   fetchCheckins();
-  // };
-
   const handleNavigateToCheckin = (cno) => {
     console.log(`Navigating to CheckinSession with cno: ${cno}`);
     navigate(`/checkin/${cid}/${cno}`);
@@ -144,6 +108,7 @@ const ClassroomManage = () => {
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
+      <Card>
       {classroom ? (
         <>
           <h2 className="text-2xl font-bold">{classroom.info.name}</h2>
@@ -155,7 +120,7 @@ const ClassroomManage = () => {
           <div ref={qrRef} className="mt-2"></div>
 
           {/* ตารางแสดงรายชื่อนักเรียน */}
-          <h3 className="text-lg font-semibold mt-6">รายชื่อนักเรียน</h3>
+          <h3 className="text-lg font-semibold my-6">รายชื่อนักเรียน</h3>
           <table className="min-w-full border-collapse border border-gray-300 mt-2">
             <thead>
               <tr>
@@ -179,7 +144,7 @@ const ClassroomManage = () => {
             </tbody>
           </table>
 
-          <h2 className="text-lg font-semibold mb-4">จัดการเช็คชื่อ</h2>
+          <h2 className="text-lg font-semibold my-6">จัดการเช็คชื่อ</h2>
           <div className="mb-4 flex gap-2">
             <input
               type="text"
@@ -201,7 +166,7 @@ const ClassroomManage = () => {
             </button>
           </div>
 
-          <h3 className="text-lg font-semibold mt-6">ประวัติการเช็คชื่อ</h3>
+          <h3 className="text-lg font-semibold my-6">ประวัติการเช็คชื่อ</h3>
           <table className="w-full border-collapse border border-gray-400">
             <thead>
               <tr>
@@ -246,6 +211,7 @@ const ClassroomManage = () => {
       ) : (
         <p className="text-center mt-10 text-gray-500">กำลังโหลดข้อมูล...</p>
       )}
+      </Card>
     </div>
   );
 };

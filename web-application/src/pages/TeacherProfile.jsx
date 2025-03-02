@@ -36,6 +36,7 @@ const TeacherProfile = () => {
   if (!user) return <p className="text-center mt-10 text-gray-500">กรุณาเข้าสู่ระบบ...</p>;
 
   return (
+    <div className="bg-gray-50 h-screen">
     <div className="p-6 max-w-4xl mx-auto">
       <Card className="p-4 flex flex-col items-center text-center">
         <Avatar className="w-24 h-24 mb-4" src={user.photo || "/default-avatar.png"} />
@@ -69,14 +70,15 @@ const TeacherProfile = () => {
                   <p>ไม่มีรูปภาพ</p>
                 )}
               </div>
-              <Button onClick={() => navigate(`/classroom/${classroom.id}`)}>จัดการ</Button>
+              <Button className="mt-6" onClick={() => navigate(`/classroom/${classroom.id}`)}>จัดการ</Button>
             </Card>
           ))}
         </div>
       ) : (
         <p className="text-gray-500 mt-4 text-center">ยังไม่มีวิชาในระบบ</p>
       )}
-      <Button color="danger" variant="solid" onClick={logout}>Logout</Button>
+      <Button className="mt-6" color="danger" variant="solid" onClick={logout}>Logout</Button>
+    </div>
     </div>
   );
 };

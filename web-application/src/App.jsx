@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./AuthContext";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
-import Profile from "./pages/Profile";
 import TeacherProfile from "./pages/teacherProfile";
 import AddClass from "./pages/AddClass";
 import EditTeacherProfile from "./pages/EditTeacherProfile";
@@ -18,13 +17,12 @@ const App = () => {
         <Routes>
           <Route path="/" element={<Login />} />
           {/* <Route path="/" element={<Home />} /> */}
-          <Route path="/profile" element={<Profile />} />
           <Route path="/teacher-profile" element={<TeacherProfile />}/>
           <Route path="/add-class" element={<AddClass />}/>
           <Route path="/edit-teacher-profile" element={<EditTeacherProfile />} />
           <Route path="/classroom/:cid" element={<ClassroomManage />} />
           <Route path="/checkin/:cid/:cno" element={<CheckinSession />}/>
-          <Route path="/question-answer" element={<QuestionAnswer />}/>
+          <Route path="/question-answer/:cid/:cno" element={<QuestionAnswer />}/>
         </Routes>
       </Router>
     </AuthProvider>

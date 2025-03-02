@@ -1,18 +1,20 @@
-import { initializeApp } from "firebase/app";
+import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import { getFirestore, setDoc, getDoc, doc } from 'firebase/firestore';
-const firebaseConfig = {
-    apiKey: "AIzaSyD6TZt5-9BpoYA31Qv1R7uXq8qwr5pIdq8",
-    authDomain: "web-and-mobile-app-629ee.firebaseapp.com",
-    projectId: "web-and-mobile-app-629ee",
-    storageBucket: "web-and-mobile-app-629ee.firebasestorage.app",
-    messagingSenderId: "696041821628",
-    appId: "1:696041821628:web:4bc24c13691924baeb07b9",
-    measurementId: "G-9XBBRVXV67"
-  };
+import { getDatabase, ref, set, update, onValue } from "firebase/database";
+import { firebaseConfig } from "./firebaseConfig";
+// Initialize Firebase only if not already initialized
+let app;
+if (getApps().length === 0) {
+  app = initializeApp(firebaseConfig); // Initialize only if no Firebase app exists
+} else {
+  app = getApp(); // Use the already initialized Firebase app
+}
+const auth = getAuth(app);
+const db = getFirestore(app);
+export const rtdb = getDatabase(app);
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
-  
-  export { auth, db, createUserWithEmailAndPassword, signInWithEmailAndPassword, setDoc, getDoc, doc };
+console.log("Firebase app initialized:", app);
+console.log("Database reference:", db);
+
+export { auth, db, createUserWithEmailAndPassword, signInWithEmailAndPassword, setDoc, getDoc, doc,ref, set, update, onValue };

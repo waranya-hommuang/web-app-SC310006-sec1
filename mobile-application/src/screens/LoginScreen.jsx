@@ -26,7 +26,7 @@ const LoginScreen = () => {
       if (!userDoc.exists()) {
         // If user doesn't exist, create user data in Firestore
         await setDoc(userRef, {
-          name: user.displayName || 'Unknown',
+          // name: user.displayName || 'Unknown',
           email: user.email,
           photo: user.photoURL || '',
           classroom: {}
@@ -50,7 +50,7 @@ const LoginScreen = () => {
 
       // Save the new user to Firestore
       await setDoc(doc(db, 'users', user.uid), {
-        name: 'New User',
+        // name: 'New User',
         email: user.email,
         photo: '',
         classroom: {}

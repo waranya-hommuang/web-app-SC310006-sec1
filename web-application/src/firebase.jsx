@@ -4,20 +4,14 @@ import { getAnalytics } from "firebase/analytics";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
 import { getFirestore, doc, setDoc, getDoc, collection, query, where } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
+import { getDatabase, ref, set, update, onValue } from "firebase/database"; 
+import { firebaseConfig } from './firebaseConfig';
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyD6TZt5-9BpoYA31Qv1R7uXq8qwr5pIdq8",
-  authDomain: "web-and-mobile-app-629ee.firebaseapp.com",
-  projectId: "web-and-mobile-app-629ee",
-  storageBucket: "web-and-mobile-app-629ee.firebasestorage.app",
-  messagingSenderId: "696041821628",
-  appId: "1:696041821628:web:4bc24c13691924baeb07b9",
-  measurementId: "G-9XBBRVXV67"
-};
+
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
@@ -28,7 +22,8 @@ export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
 export const provider = new GoogleAuthProvider();
-
+export const rtdb = getDatabase(app);
+export {ref, set, update, onValue };
 // ฟังก์ชัน Login
 export const signInWithGoogle = async () => {
     try {

@@ -2,7 +2,7 @@ import React,{ useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { signInWithGoogle } from "../firebase";
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
-import { Button } from "antd";
+import { Button, Card } from "antd";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -25,9 +25,17 @@ const Login = () => {
     }
   };
   return (
-    <div className="login-container">
-      <h2>Login as Teacher</h2>
+    <div className="bg-gray-100 h-screen">
+    <div className="p-6 max-w-4xl mx-auto ">
+      <Card
+      title="Login as Teacher"
+      variant="borderless"
+    
+    >
+      {/* <h1></h1> */}
       <Button color="cyan" variant="solid" onClick={handleLogin}>Sign in with Google</Button>
+      </Card>
+    </div>
     </div>
   );
 };
