@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Button, Alert, StyleSheet, FlatList, Image } from "react-native";
+import { View, Text, Button, Alert, StyleSheet, FlatList, Image, ScrollView } from "react-native";
 import { getAuth } from "firebase/auth";
 import { getFirestore, doc, getDoc, collection, getDocs, query, where } from "firebase/firestore";
 import { useNavigation } from "@react-navigation/native";

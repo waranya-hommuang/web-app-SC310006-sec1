@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, TextInput, Button, Text } from 'react-native';
+import { View, TextInput, Button, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { getDatabase, ref, set, onValue, get } from 'firebase/database';
 
 const AnswerQuestionScreen = ({ route, navigation }) => {
@@ -73,23 +73,95 @@ const AnswerQuestionScreen = ({ route, navigation }) => {
   }
 
   return (
-    <View style={{ padding: 20 }}>
-      <Text style={{ marginBottom: 10 }}>{questionText}</Text>
-      <TextInput
-        value={answer}
-        onChangeText={setAnswer}
-        placeholder="กรุณาตอบคำถาม"
-        style={{
-          height: 40,
-          borderColor: '#ccc',
-          borderWidth: 1,
-          marginBottom: 20,
-          paddingLeft: 10,
-        }}
-      />
-      <Button title="ส่งคำตอบ" onPress={handleSubmitAnswer} />
-    </View>
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.title}>Answer the Question</Text>
+
+      {/* ตรวจสอบว่า questionShow เป็น true หรือไม่ */}
+      {questionShow ? (
+        <>
+          <Text style={styles.questionText}>{questionText}</Text>
+
+          {/* ช่องกรอกคำตอบ */}
+          <TextInput
+            placeholder="Enter your answer here..."
+            value={answer}
+            onChangeText={setAnswer}
+            style={styles.input}
+            multiline
+            numberOfLines={4}
+          />
+
+          {/* ปุ่มส่งคำตอบ */}
+          <TouchableOpacity style={styles.submitButton} onPress={handleSubmitAnswer}>
+            <Text style={styles.buttonText}>Submit Answer</Text>
+          </TouchableOpacity>
+        </>
+      ) : (
+        <Text style={styles.noQuestionText}>No question available for this check-in.</Text>
+      )}
+
+      {/* ปุ่มกลับไปหน้าหลัก */}
+      <TouchableOpacity style={styles.goHomeButton} onPress={() => navigation.navigate("Home")}>
+        <Text style={styles.buttonText}>Go to Home</Text>
+      </TouchableOpacity>
+    </ScrollView>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+    backgroundColor: '#f9f9f9',
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    color: '#333',
+  },
+  questionText: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 20,
+    color: '#333',
+    textAlign: 'center',
+  },
+  input: {
+    borderWidth: 1,
+    width: '100%',
+    padding: 12,
+    marginBottom: 20,
+    borderRadius: 8,
+    borderColor: '#ddd',
+    backgroundColor: '#fff',
+    fontSize: 16,
+  },
+  submitButton: {
+    backgroundColor: '#4CAF50',
+    paddingVertical: 14,
+    paddingHorizontal: 40,
+    borderRadius: 8,
+    marginBottom: 20,
+  },
+  goHomeButton: {
+    backgroundColor: '#007BFF',
+    paddingVertical: 14,
+    paddingHorizontal: 40,
+    borderRadius: 8,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    textAlign: 'center',
+  },
+  noQuestionText: {
+    fontSize: 18,
+    color: '#888',
+    textAlign: 'center',
+  },
+});
 
 export default AnswerQuestionScreen;

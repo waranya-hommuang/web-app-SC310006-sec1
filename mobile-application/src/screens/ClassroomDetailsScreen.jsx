@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, Button, StyleSheet, Alert } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Button, StyleSheet, Alert } from "react-native";
 import { getAuth } from "firebase/auth";
 import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -94,18 +94,22 @@ const ClassroomDetailsScreen = ({ route, navigation }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Class Details</Text>
-      <Text>Class ID: {cid}</Text>
-      <Text>Check-in No: {cno}</Text>
 
-      {classInfo ? (
-        <>
-          <Text>Subject Code: {classInfo.code}</Text>
-          <Text>Subject Name: {classInfo.name}</Text>
-          <Text>Room: {classInfo.room}</Text>
-        </>
-      ) : (
-        <Text>Loading class info...</Text>
-      )}
+      {/* แสดงข้อมูลพื้นฐาน */}
+      <View style={styles.infoContainer}>
+        <Text style={styles.infoText}>Class ID: <Text style={styles.infoValue}>{cid}</Text></Text>
+        <Text style={styles.infoText}>Check-in No: <Text style={styles.infoValue}>{cno}</Text></Text>
+
+        {classInfo ? (
+          <>
+            <Text style={styles.infoText}>Subject Code: <Text style={styles.infoValue}>{classInfo.code}</Text></Text>
+            <Text style={styles.infoText}>Subject Name: <Text style={styles.infoValue}>{classInfo.name}</Text></Text>
+            <Text style={styles.infoText}>Room: <Text style={styles.infoValue}>{classInfo.room}</Text></Text>
+          </>
+        ) : (
+          <Text style={styles.infoText}>Loading class info...</Text>
+        )}
+      </View>
 
       {/* ช่องกรอกหมายเหตุ */}
       <TextInput
@@ -114,25 +118,75 @@ const ClassroomDetailsScreen = ({ route, navigation }) => {
         onChangeText={setRemark}
         style={styles.input}
       />
-      <Button title="Save Remark" onPress={handleSaveRemark} />
 
-      {/* ปุ่มที่พานักเรียนไปยังหน้าจอ AnswerQuestionScreen ถ้า question_show เป็น true */}
-      
-        <Button
-          title="Go to Answer Questions"
-          onPress={handleGoToAnswerQuestionScreen}
-        />
+      {/* ปุ่ม Save Remark */}
+      <TouchableOpacity style={styles.button} onPress={handleSaveRemark}>
+        <Text style={styles.buttonText}>Save Remark</Text>
+      </TouchableOpacity>
+
+      {/* ปุ่มไปยังหน้าถัดไป */}
+      <TouchableOpacity style={styles.button} onPress={handleGoToAnswerQuestionScreen}>
+        <Text style={styles.buttonText}>Go to Answer Questions</Text>
+      </TouchableOpacity>
 
       {/* ปุ่มกลับไปหน้าหลัก */}
-      <Button title="Go to Home" onPress={() => navigation.navigate("Home")} />
+      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("Home")}>
+        <Text style={styles.buttonText}>Go to Home</Text>
+      </TouchableOpacity>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, justifyContent: "center", alignItems: "center" },
-  title: { fontSize: 24, fontWeight: "bold", marginBottom: 10 },
-  input: { borderWidth: 1, width: "80%", padding: 10, margin: 5 },
+  container: {
+    flex: 1,
+    padding: 20,
+    justifyContent: "flex-start", // Align items to the top
+    backgroundColor: "#f9f9f9", // เพิ่มสีพื้นหลัง
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "#333",
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  infoContainer: {
+    width: "100%",
+    marginBottom: 20,
+  },
+  infoText: {
+    fontSize: 16,
+    marginVertical: 5,
+    color: "#555",
+  },
+  infoValue: {
+    fontWeight: "bold",
+    color: "#2b8a3e",
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#ddd",
+    width: "100%",
+    padding: 12,
+    marginBottom: 20,
+    borderRadius: 8,
+    backgroundColor: "#fff",
+    fontSize: 16,
+  },
+  button: {
+    backgroundColor: "#4CAF50",
+    paddingVertical: 12,
+    paddingHorizontal: 30,
+    borderRadius: 8,
+    marginVertical: 10,
+    alignItems: "center",
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
 });
 
 export default ClassroomDetailsScreen;

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, Button, Alert, StyleSheet, TextInput } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { getAuth } from "firebase/auth";
 import { getFirestore, collection, query, where, getDocs, doc, getDoc, setDoc } from "firebase/firestore";
 import { useNavigation } from "@react-navigation/native";
@@ -96,31 +96,68 @@ const CheckInScreen = ({ route }) => {
 
     return (
         <View style={styles.container}>
-            <Text>Class ID: {cid}</Text>
+      <Text style={styles.title}>Class ID: {cid}</Text>
 
-            <TextInput
-                placeholder="Enter Check-in No (CNO)"
-                value={cnoInput}
-                onChangeText={setCnoInput}
-                style={styles.input}
-                keyboardType="numeric"
-            />
+      <TextInput
+        placeholder="Enter Check-in No (CNO)"
+        value={cnoInput}
+        onChangeText={setCnoInput}
+        style={styles.input}
+        keyboardType="numeric"
+      />
 
-            <TextInput
-                placeholder="Enter Check-in Code"
-                value={code}
-                onChangeText={setCode}
-                style={styles.input}
-            />
+      <TextInput
+        placeholder="Enter Check-in Code"
+        value={code}
+        onChangeText={setCode}
+        style={styles.input}
+      />
 
-            <Button title="Check In" onPress={handleCheckIn} />
-        </View>
-    );
+      <TouchableOpacity style={styles.checkInButton} onPress={handleCheckIn}>
+        <Text style={styles.buttonText}>Check In</Text>
+      </TouchableOpacity>
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
-    container: { flex: 1, justifyContent: "center", alignItems: "center", padding: 20 },
-    input: { borderWidth: 1, width: "80%", padding: 10, margin: 10, borderRadius: 5 },
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+    backgroundColor: "#f7f7f7",
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 20,
+    color: "#333",
+  },
+  input: {
+    borderWidth: 1,
+    width: "80%",
+    padding: 12,
+    marginVertical: 10,
+    borderRadius: 8,
+    borderColor: "#ddd",
+    backgroundColor: "#fff",
+    fontSize: 16,
+  },
+  checkInButton: {
+    backgroundColor: "#4CAF50",
+    paddingVertical: 12,
+    paddingHorizontal: 30,
+    borderRadius: 8,
+    marginTop: 20,
+    elevation: 3,
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "bold",
+    textAlign: "center",
+  },
 });
 
 export default CheckInScreen;

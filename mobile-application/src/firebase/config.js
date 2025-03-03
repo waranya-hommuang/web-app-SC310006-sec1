@@ -14,7 +14,7 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 export const rtdb = getDatabase(app);
 
-console.log("Firebase app initialized:", app);
-console.log("Database reference:", db);
+// console.log("Firebase app initialized:", app);
+// console.log("Database reference:", db);
 
 export { auth, db, createUserWithEmailAndPassword, signInWithEmailAndPassword, setDoc, getDoc, doc,ref, set, update, onValue };

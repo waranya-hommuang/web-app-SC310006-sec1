@@ -120,7 +120,7 @@ const ClassroomManage = () => {
           <div ref={qrRef} className="mt-2"></div>
 
           {/* ตารางแสดงรายชื่อนักเรียน */}
-          <h3 className="text-lg font-semibold my-6">รายชื่อนักเรียน</h3>
+          <h3 className="text-lg font-semibold my-6">รายชื่อนักเรียนที่ลงทะเบียน</h3>
           <table className="min-w-full border-collapse border border-gray-300 mt-2">
             <thead>
               <tr>

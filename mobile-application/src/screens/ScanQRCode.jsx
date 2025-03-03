@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Button, StyleSheet, Text, TouchableOpacity, View, TextInput, Alert } from "react-native";
+import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity, ScrollView, Alert  } from "react-native";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { collection, doc, setDoc } from "firebase/firestore";
 import { auth, db } from "../firebase/config";
@@ -82,25 +82,30 @@ const ScanQRCode = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <CameraView
         style={styles.camera}
         facing="back"
         onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
         barcodeScannerSettings={{ barcodeTypes: ["qr"] }} // กำหนดให้รองรับ QR Code
       />
+
       {scanned && (
-        <Button title="Scan Again" onPress={() => setScanned(false)} />
+        <TouchableOpacity style={styles.scanAgainButton} onPress={() => setScanned(false)}>
+          <Text style={styles.buttonText}>Scan Again</Text>
+        </TouchableOpacity>
       )}
 
       {classCode ? (
         <>
-          <Text>Class CID: {classCode}</Text>
+          <Text style={styles.classCodeText}>Class CID: {classCode}</Text>
+
           <TextInput
             placeholder="Enter Student ID"
             value={studentID}
             onChangeText={setStudentID}
             style={styles.input}
+            keyboardType="numeric"
           />
           <TextInput
             placeholder="Enter Name"
@@ -108,20 +113,72 @@ const ScanQRCode = () => {
             onChangeText={setName}
             style={styles.input}
           />
-          <Button title="Register" onPress={handleRegister} />
+
+          <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
+            <Text style={styles.buttonText}>Register</Text>
+          </TouchableOpacity>
         </>
       ) : (
-        <Text>Scan a QR Code to register</Text>
+        <Text style={styles.instructionText}>Scan a QR Code to register</Text>
       )}
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: "center", alignItems: "center" },
-  camera: { width: "100%", height: 400 },
-  input: { borderWidth: 1, width: "80%", padding: 10, margin: 5 },
-  message: { fontSize: 18, textAlign: "center", marginBottom: 20 },
+  container: {
+    flexGrow: 1,  // ทำให้ ScrollView ขยายเต็มที่
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f8f9fa",
+    padding: 20,
+  },
+  camera: {
+    width: "100%",
+    height: 400,
+    borderRadius: 10,
+    overflow: "hidden",
+    marginBottom: 20,
+  },
+  input: {
+    width: "80%",
+    padding: 12,
+    margin: 10,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 5,
+    backgroundColor: "#fff",
+  },
+  classCodeText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 20,
+  },
+  instructionText: {
+    fontSize: 16,
+    color: "#888",
+    textAlign: "center",
+    marginTop: 20,
+  },
+  scanAgainButton: {
+    backgroundColor: "#007BFF",
+    padding: 12,
+    borderRadius: 5,
+    marginBottom: 20,
+  },
+  registerButton: {
+    backgroundColor: "#28a745",
+    padding: 12,
+    borderRadius: 5,
+    width: "80%",
+    marginTop: 20,
+    marginBottom: 40,
+  },
+  buttonText: {
+    color: "#fff",
+    textAlign: "center",
+    fontWeight: "bold",
+  },
 });
 
 export default ScanQRCode;
