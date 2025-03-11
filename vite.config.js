@@ -1,31 +1,36 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import tailwindcss from '@tailwindcss/vite'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
 import { NodeGlobalsPolyfillPlugin } from '@esbuild-plugins/node-globals-polyfill';
 
-// https://vite.dev/config/
 export default defineConfig({
+  base: "/web-app-SC310006-sec1/",
   build: {
-    base: '/web-app-SC310006-sec1/',
-    outDir: 'dist',
+    outDir: "dist",
   },
   plugins: [
     react(),
-    tailwindcss()
+    tailwindcss(),
   ],
   resolve: {
     alias: {
-      crypto: 'crypto-browserify',
-      stream: 'stream-browserify',
-      buffer: 'buffer',
+      crypto: "crypto-browserify",
+      stream: "stream-browserify",
+      buffer: "buffer",
     },
   },
   optimizeDeps: {
     esbuildOptions: {
       define: {
-        global: 'globalThis',
+        global: "globalThis",
       },
-      plugins: [NodeGlobalsPolyfillPlugin({ buffer: true })],
+      plugins: [
+        NodeGlobalsPolyfillPlugin({
+          process: true,
+          buffer: true,
+        }),
+      ],
     },
   },
 });
+
