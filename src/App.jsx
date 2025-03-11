@@ -13,7 +13,7 @@ import QuestionAnswer from "./pages/QuestionAnswerScreen";
 const App = () => {
   return (
     <AuthProvider>
-      <Router>
+      <Router basename="/web-app-SC310006-sec1">
         <Routes>
           <Route path="/" element={<Login />} />
           {/* <Route path="/" element={<Home />} /> */}
