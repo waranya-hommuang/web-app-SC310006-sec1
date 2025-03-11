@@ -1,5 +1,5 @@
 {
-  "homepage": "https://waranya-hommuang.github.io/web-app-SC310006-sec1",
+  "homepage": "https://waranya-hommuang.github.io/web-app-SC310006-sec1/",
   "name": "web-application",
   "private": true,
   "version": "0.0.0",
@@ -9,7 +9,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "predeploy": "vite build",
+    "predeploy": "npm run build",
     "deploy": "gh-pages -d dist"
   },
   "dependencies": {
