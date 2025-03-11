@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { HashRouter as Router, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./AuthContext";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -13,7 +13,7 @@ import QuestionAnswer from "./pages/QuestionAnswerScreen";
 const App = () => {
   return (
     <AuthProvider>
-      <Router basename="/web-app-SC310006-sec1">
+      <Router>
         <Routes>
           <Route path="/" element={<Login />} />
           {/* <Route path="/" element={<Home />} /> */}
