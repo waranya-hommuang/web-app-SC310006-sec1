@@ -4,8 +4,8 @@ import tailwindcss from '@tailwindcss/vite'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/web-app-SC310006-sec1/',
   build: {
+    base: '/web-app-SC310006-sec1/',
     outDir: 'dist',
   },
   plugins: [
