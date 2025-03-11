@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
+import { NodeGlobalsPolyfillPlugin } from '@esbuild-plugins/node-globals-polyfill';
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -12,7 +13,19 @@ export default defineConfig({
     react(),
     tailwindcss()
   ],
-  define: {
-    'globalThis.crypto': 'require("crypto")'
-  }
-})
+  resolve: {
+    alias: {
+      crypto: 'crypto-browserify',
+      stream: 'stream-browserify',
+      buffer: 'buffer',
+    },
+  },
+  optimizeDeps: {
+    esbuildOptions: {
+      define: {
+        global: 'globalThis',
+      },
+      plugins: [NodeGlobalsPolyfillPlugin({ buffer: true })],
+    },
+  },
+});

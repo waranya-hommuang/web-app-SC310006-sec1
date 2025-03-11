@@ -4,6 +4,7 @@ import { getFirestore, collection, doc, getDoc, getDocs, addDoc,setDoc, query, o
 import { useAuth } from '../AuthContext';
 import { db } from "../firebase";
 import { Button, Card, Space, Table, Tag } from "antd";
+import QRCode from 'qrcode';
 
 const ClassroomManage = () => {
   const { user } = useAuth();
@@ -41,9 +42,7 @@ const ClassroomManage = () => {
 
   useEffect(() => {
     if (classroom && qrRef.current) {
-      qrRef.current.innerHTML = "";
-      new window.QRCode(qrRef.current, {
-        text: `https://your-app.com/register/${cid}`,
+      QRCode.toCanvas(qrRef.current, `https://your-app.com/register/${cid}`, {
         width: 150,
         height: 150,
       });
@@ -117,7 +116,7 @@ const ClassroomManage = () => {
 
           {/* QR Code */}
           <h3 className="text-lg font-semibold mt-6">QR Code ลงทะเบียน</h3>
-          <div ref={qrRef} className="mt-2"></div>
+          <canvas ref={qrRef} />
 
           {/* ตารางแสดงรายชื่อนักเรียน */}
           <h3 className="text-lg font-semibold my-6">รายชื่อนักเรียนที่ลงทะเบียน</h3>
